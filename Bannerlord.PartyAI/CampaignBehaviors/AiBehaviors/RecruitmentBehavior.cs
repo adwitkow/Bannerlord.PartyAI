@@ -1,7 +1,9 @@
-﻿using Bannerlord.PartyAI.Domain;
+﻿using Bannerlord.PartyAI.Compat;
+using Bannerlord.PartyAI.Domain;
 using Bannerlord.PartyAI.Domain.Models;
 using Bannerlord.PartyAI.Models;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
@@ -69,9 +71,64 @@ internal class RecruitmentBehavior : PartyOrderBehaviorBase
         var targetSettlement = order.Target as Settlement;
         if (ShouldPickNewRecruitmentTarget(settings, party, targetSettlement, partyComposition))
         {
+            // First try to find a settlement where IHM advertises a real troop
+            // that belongs to the selected PAC template/upgrade path.
             var newTarget = Navigation.FindNearestSettlement(
-                s => IsGoodTargetForRecruiting(s, party, settings, partyComposition),
+                s => IsGoodIhmTargetForRecruiting(s, party, settings),
                 party);
+
+            if (newTarget is not null)
+            {
+                var match = IhmRecruitmentBridge.FindBestTemplateMatch(
+                    newTarget,
+                    settings);
+
+                if (match is not null)
+                {
+                    var leaderName = party.LeaderHero?.Name?.ToString()
+                        ?? party.Name?.ToString()
+                        ?? "<unknown party>";
+
+                    Debug.Print(
+                        $"[PAC-IHM] {leaderName} is traveling to " +
+                        $"{newTarget.Name} to recruit IHM troop " +
+                        $"{match.AdvertisedTroop.Name} " +
+                        $"(T{match.AdvertisedTroop.Tier}), targeting " +
+                        $"{match.DesiredTemplateTroop.Name} " +
+                        $"(T{match.DesiredTemplateTroop.Tier}).");
+
+                    if (match.DesiredTemplateTroop.Tier >= 6)
+                    {
+                        Debug.Print(
+                            $"[PAC-IHM][T6] {leaderName} is going to " +
+                            $"{newTarget.Name} for a route to T6 " +
+                            $"{match.DesiredTemplateTroop.Name}; " +
+                            $"IHM currently advertises " +
+                            $"{match.AdvertisedTroop.Name} " +
+                            $"(T{match.AdvertisedTroop.Tier}).");
+                    }
+                }
+            }
+            else
+            {
+                // No physical IHM match exists right now.
+                // Preserve PAC's original behavior as a fallback.
+                newTarget = Navigation.FindNearestSettlement(
+                    s => IsGoodTargetForRecruiting(
+                        s,
+                        party,
+                        settings,
+                        partyComposition),
+                    party);
+
+                var leaderName = party.LeaderHero?.Name?.ToString()
+                    ?? party.Name?.ToString()
+                    ?? "<unknown party>";
+
+                Debug.Print(
+                    $"[PAC-IHM] No IHM template match currently advertised " +
+                    $"for {leaderName}; falling back to normal PAC recruitment.");
+            }
 
             settings.Order?.Target = newTarget;
             targetSettlement = newTarget;
@@ -110,6 +167,38 @@ internal class RecruitmentBehavior : PartyOrderBehaviorBase
         var canVisitSettlement = CanVisitSettlement(party, currentSettlement);
 
         return settlementRecentlyVisited || !volunteersAvailable || !canVisitSettlement;
+    }
+
+    private bool IsGoodIhmTargetForRecruiting(
+        Settlement settlement,
+        MobileParty party,
+        PartyAiEntitySettings settings)
+    {
+        if (!settlement.IsVillage && !settlement.IsTown)
+        {
+            return false;
+        }
+
+        if (!CanVisitSettlement(party, settlement))
+        {
+            return false;
+        }
+
+        if (!settings.RecruitFromEnemySettlements
+            && FactionManager.IsAtWarAgainstFaction(
+                party.MapFaction,
+                settlement.MapFaction))
+        {
+            return false;
+        }
+
+        if (_recentlyRecruitedFromSettlements.Any(
+            l => l.Settlement == settlement && l.Party == party))
+        {
+            return false;
+        }
+
+        return IhmRecruitmentBridge.HasTemplateMatch(settlement, settings);
     }
 
     private bool IsGoodTargetForRecruiting(
