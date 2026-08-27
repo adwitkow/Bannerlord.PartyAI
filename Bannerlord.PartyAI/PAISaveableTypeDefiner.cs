@@ -26,6 +26,14 @@ internal class PAISaveableTypeDefiner : SaveableTypeDefiner
     {
         AddEnumDefinition(typeof(PartyAiOrderType), 1001);
         AddEnumDefinition(typeof(InputKey), 1002);
+#if !LOWER_THAN_1_5
+        // On 1.5+, vanilla's SaveableCampaignTypeDefiner no longer defines MobileParty.PartyObjective, but
+        // PartyAiEntitySettings.CachedPartyObjective ([SaveableProperty(9)]) still serializes a value of that
+        // type on every save. Without this registration the write emits an unregistered enum the loader cannot
+        // read back, corrupting the save (crash in LoadContext::Load Object Datas on load). The field is
+        // otherwise dead on 1.5+ (only consumed under LOWER_THAN_1_5), so registering it is harmless.
+        AddEnumDefinition(typeof(TaleWorlds.CampaignSystem.Party.MobileParty.PartyObjective), 1003);
+#endif
     }
 
     protected override void DefineContainerDefinitions()
