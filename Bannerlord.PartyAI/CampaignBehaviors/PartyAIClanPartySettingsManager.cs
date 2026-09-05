@@ -283,13 +283,6 @@ public class PartyAIClanPartySettingsManager : CampaignBehaviorBase
         _caravanSettings ??= new Dictionary<Hero, PartyAiEntitySettings>();
         _partyTemplates ??= new List<PAICustomTemplate>();
 
-        // convert compositions when template is active
-        foreach (var settings in _partySettings.Values)
-        {
-            PartyComposition composition = settings.Composition;
-            composition.ApplyTemplate(settings.PartyTemplate, out _);
-        }
-
         // set default fallback values here
         if (!dataStore.SyncData("AllowTroopConversion", ref AllowTroopConversion) && dataStore.IsLoading)
         {
