@@ -1,5 +1,4 @@
-﻿using Bannerlord.PartyAI.Domain.Models;
-using Bannerlord.PartyAI.Models;
+﻿using Bannerlord.PartyAI.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -34,9 +33,6 @@ public class PartyAIClanPartySettingsManager : CampaignBehaviorBase
     internal bool AIRecruitCulture = false;
     internal InputKey ControlPanelModiferKey = InputKey.LeftControl;
     internal InputKey ControlPanelKey = InputKey.P;
-    internal InputKey CommandedPartiesModiferKey = InputKey.LeftAlt;
-    internal InputKey CommandedPartiesKey = InputKey.X;
-    internal InputKey CommandPartiesKey = InputKey.LeftAlt;
 
     public override void RegisterEvents()
     {
@@ -367,21 +363,6 @@ public class PartyAIClanPartySettingsManager : CampaignBehaviorBase
         if (!dataStore.SyncData("ControlPanelKey", ref ControlPanelKey) && dataStore.IsLoading)
         {
             ControlPanelKey = InputKey.P;
-        }
-
-        if (!dataStore.SyncData("CommandedPartiesModiferKey", ref CommandedPartiesModiferKey) && dataStore.IsLoading)
-        {
-            CommandedPartiesModiferKey = InputKey.LeftAlt;
-        }
-
-        if (!dataStore.SyncData("CommandedPartiesKey", ref CommandedPartiesKey) && dataStore.IsLoading)
-        {
-            CommandedPartiesKey = InputKey.X;
-        }
-
-        if (!dataStore.SyncData("CommandPartiesKey", ref CommandPartiesKey) && dataStore.IsLoading)
-        {
-            CommandPartiesKey = InputKey.LeftAlt;
         }
     }
 }

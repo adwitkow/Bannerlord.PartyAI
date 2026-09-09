@@ -139,18 +139,8 @@ public class PartyAIModOptionsVM : ViewModel
             SubModule.PartySettingsManager.ControlPanelModiferKey,
             SubModule.PartySettingsManager.ControlPanelKey,
             true);
-        CommandedPartiesKeySelector = new(
-            SubModule.PartySettingsManager.CommandedPartiesModiferKey,
-            SubModule.PartySettingsManager.CommandedPartiesKey,
-            true);
-        CommandPartiesKeySelector = new(
-            TaleWorlds.InputSystem.InputKey.Invalid,
-            SubModule.PartySettingsManager.CommandPartiesKey,
-            false);
 
         ControlPanelKeySelectorHint = new HintViewModel(new("{=PAIQNbMherW}Keybind to open this control panel. If you lock yourself out with a broken key combo, use partyai.open in the console to get back here and fix it."));
-        CommandedPartiesKeySelectorHint = new HintViewModel(new("{=PAIdjKjbD9Y}Keybind to choose which parties to directly command. Press ALT+X (default) to choose nearby parties, then hold ALT (default) to order them around."));
-        CommandPartiesKeySelectorHint = new HintViewModel(new("{=PAIY9zrtsqV}Keybind to command nearby parties. Press ALT+X (default) to choose nearby parties, then hold ALT (default) to order them around."));
         LeaderRosterTextHint = new HintViewModel(new TextObject("{=PAIBKfwhLn2}Heroes that we are allowed to create parties for. If blank, all available heroes will be considered."));
         AutoCreateClanPartiesMaxHint = new HintViewModel(new TextObject("{=PAIi4vuS6na}Limits the maximum amount of clan parties that will be auto created."));
         ChangeHeroRosterHint = new HintViewModel(new TextObject("{=PAIQNUqwt4C}Edit"));
@@ -257,12 +247,8 @@ public class PartyAIModOptionsVM : ViewModel
     [DataSourceProperty] public PartyAIMaxPartiesDropdownVM AutoCreateClanPartiesMaxController { get; private set; }
 
     [DataSourceProperty] public PartyAIKeySelectorVM ControlPanelKeySelector { get; private set; }
-    [DataSourceProperty] public PartyAIKeySelectorVM CommandedPartiesKeySelector { get; private set; }
-    [DataSourceProperty] public PartyAIKeySelectorVM CommandPartiesKeySelector { get; private set; }
 
     [DataSourceProperty] public HintViewModel ControlPanelKeySelectorHint { get; private set; }
-    [DataSourceProperty] public HintViewModel CommandedPartiesKeySelectorHint { get; private set; }
-    [DataSourceProperty] public HintViewModel CommandPartiesKeySelectorHint { get; private set; }
     [DataSourceProperty] public HintViewModel AutoCreateClanPartiesMaxHint { get; private set; }
 
     [DataSourceProperty] public HintViewModel LeaderRosterTextHint { get; private set; }
@@ -275,9 +261,7 @@ public class PartyAIModOptionsVM : ViewModel
 
     [DataSourceProperty] public string TroopsConvertedPerDayText => new TextObject("{=PAIuVpJ2Fxq} - Per Day - ").ToString();
     [DataSourceProperty] public string ControlPanelKeySelectorText => new TextObject("{=PAIdNxjNCZ8}Control Panel: ").ToString();
-    [DataSourceProperty] public string CommandedPartiesKeySelectorText => new TextObject("{=PAIMPBJJFE1}Choose Parties: ").ToString();
-    [DataSourceProperty] public string CommandPartiesKeySelectorText => new TextObject("{=PAIYaTRiKbo}Command Parties: ").ToString();
-
+    
     [DataSourceProperty] public HintViewModel TroopsConvertedPerDayHint => new(new TextObject("{=PAImiSXBh3N}Amount of troops to convert to a party template per day. This value is per-party and applies to all managed parties, caravans, and garrisons. Helps protect against large spikes in cost from changing templates, and just makes it feel a little less awkward than magically converting 300 troops at once."));
 
     [DataSourceProperty] public string TroopsConvertedPerDayAmount => _troopsConvertedPerDay > 0 ? _troopsConvertedPerDay.ToString() : new TextObject("{=PAILiYi3RTj}All").ToString();
@@ -390,9 +374,6 @@ public class PartyAIModOptionsVM : ViewModel
 
         SubModule.PartySettingsManager.ControlPanelModiferKey = ControlPanelKeySelector.ModifierKey;
         SubModule.PartySettingsManager.ControlPanelKey = ControlPanelKeySelector.Key;
-        SubModule.PartySettingsManager.CommandedPartiesModiferKey = CommandedPartiesKeySelector.ModifierKey;
-        SubModule.PartySettingsManager.CommandedPartiesKey = CommandedPartiesKeySelector.Key;
-        SubModule.PartySettingsManager.CommandPartiesKey = CommandPartiesKeySelector.Key;
 
         // disable dismissing troops for all parties
         if (AllowTroopConversionToggle.IsSelected)

@@ -116,30 +116,6 @@
 					</Children>
 				</ListPanel>
 				
-				<!-- Select Commanded Parties Key Selector -->
-				<ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginTop="5" MarginLeft="23" StackLayout.LayoutMethod="HorizontalLeftToRight">
-					<Children>
-						<TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="180" Brush="Clan.Stat.Name.Text" VerticalAlignment="Center" Brush.TextHorizontalAlignment="Left" Text="@CommandedPartiesKeySelectorText" >
-							<Children>
-								<HintWidget DataSource="{CommandedPartiesKeySelectorHint}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" IsDisabled="false" />
-							</Children>
-						</TextWidget>
-						<PartyAIKeySelector Parameter.DataSource="{CommandedPartiesKeySelector}" />
-					</Children>
-				</ListPanel>
-				
-				<!-- Command Parties Key Selector -->
-				<ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginTop="5" MarginLeft="23" StackLayout.LayoutMethod="HorizontalLeftToRight">
-					<Children>
-						<TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="180" Brush="Clan.Stat.Name.Text" VerticalAlignment="Center" Brush.TextHorizontalAlignment="Left" Text="@CommandPartiesKeySelectorText" >
-							<Children>
-								<HintWidget DataSource="{CommandPartiesKeySelectorHint}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" IsDisabled="false" />
-							</Children>
-						</TextWidget>
-						<PartyAIKeySelector Parameter.DataSource="{CommandPartiesKeySelector}" />
-					</Children>
-				</ListPanel>
-				
 				<!-- Auto Create Clan Parties -->
 				<PartyAIOptionToggle Parameter.DataSource="{AutoCreateClanPartiesToggle}" MarginTop="30" />
 				

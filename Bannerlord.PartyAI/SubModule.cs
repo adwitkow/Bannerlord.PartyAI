@@ -1,6 +1,5 @@
 ﻿using Bannerlord.PartyAI.CampaignBehaviors;
 using Bannerlord.PartyAI.CampaignBehaviors.AiBehaviors;
-using Bannerlord.PartyAI.CampaignBehaviors.AiBehaviors.ControlAssumption;
 using Bannerlord.PartyAI.Domain;
 using Bannerlord.PartyAI.Models;
 using Bannerlord.PartyAI.Patches;
@@ -25,7 +24,6 @@ public class SubModule : MBSubModuleBase
 
     internal static PartyAIClanPartySettingsManager PartySettingsManager;
     internal static PAInformationManager InformationManager;
-    internal static ControlAssumptionBehavior ControlAssumptionBehavior;
 
     protected override void OnSubModuleLoad()
     {
@@ -65,9 +63,6 @@ public class SubModule : MBSubModuleBase
 
     private static void RegisterBehaviors(CampaignGameStarter campaignGameStarter)
     {
-        ControlAssumptionBehavior = new ControlAssumptionBehavior();
-        campaignGameStarter.AddBehavior(ControlAssumptionBehavior);
-
         PartySettingsManager = new PartyAIClanPartySettingsManager();
         campaignGameStarter.AddBehavior(PartySettingsManager);
 
@@ -76,7 +71,6 @@ public class SubModule : MBSubModuleBase
         campaignGameStarter.AddBehavior(new PartyAutoCreationBehavior());
         campaignGameStarter.AddBehavior(new RecruitmentBehavior());
         campaignGameStarter.AddBehavior(new EscortBehavior());
-        campaignGameStarter.AddBehavior(new AttackPartyBehavior());
         var visitSettlementBehavior = new VisitSettlementBehavior();
         campaignGameStarter.AddBehavior(visitSettlementBehavior);
         var stayInSettlementBehavior = new StayInSettlementBehavior(visitSettlementBehavior);
@@ -128,12 +122,6 @@ public class SubModule : MBSubModuleBase
             ControlPanel.Open();
             return;
         }
-
-        if (ControlAssumptionBehavior.IsKeyCombinationDown())
-        {
-            ControlAssumptionBehavior.OpenPopup();
-            return;
-        }
     }
 
     private static void ApplyPatches(Harmony harmony)
@@ -148,7 +136,6 @@ public class SubModule : MBSubModuleBase
         InventoryLogicPatches.Apply(harmony);
         LeaveTroopsToSettlementActionPatch.Apply(harmony);
         MobilePartyAiPatches.Apply(harmony);
-        MobilePartyPatches.Apply(harmony);
         PartiesBuyHorseCampaignBehaviorPatch.Apply(harmony);
         PartyVMPatches.Apply(harmony);
         RecruitmentCampaignBehaviorPatches.Apply(harmony);
