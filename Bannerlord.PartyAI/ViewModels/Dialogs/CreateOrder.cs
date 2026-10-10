@@ -21,19 +21,19 @@ internal class CreateOrder
     private static bool _fallback;
 
     private static readonly string _titleText = new TextObject("{=PAIUq8Q1n8k}Choose which type of order to add").ToString();
-    private static readonly string _landpatrolText = new TextObject("{=PAIaOu88dqT}Patrol an Area").ToString();
-    private static readonly string _visitText = new TextObject("{=PAIIL6JG6Na}Visit A Settlement").ToString();
-    private static readonly string _escortText = new TextObject("{=PAI1Et6heEa}Escort A Party").ToString();
+    private static readonly string _landpatrolText = new TextObject("{=PAIaOu88dqT}Patrol an area").ToString();
+    private static readonly string _visitText = new TextObject("{=PAIIL6JG6Na}Visit a settlement").ToString();
+    private static readonly string _escortText = new TextObject("{=PAI1Et6heEa}Escort a party").ToString();
     private static readonly string _recruitText = new TextObject("{=PAIyzzBSM4P}Recruit").ToString();
     private static readonly string _recruitHint = new TextObject("{=PAIHJFAtbk8}Order the party leader to only focus on recruiting troops. If they have an assigned troop template, they will only visit settlements that offer those troops. Keep in mind these settlements may be far away.").ToString();
-    private static readonly string _stayInSettlementText = new TextObject("{=PAIOzsG1s1J}Stay In A Settlement").ToString();
-    private static readonly string _landpatrolHintText = new TextObject("{=PAIPQxGUfhd}Patrol around the target settlement. The party will visit villages and towns to restock its troops and supplies. Bandits and other enemies will be chased down if the party leader believes they can be caught. The party will defend villages and castles/towns within its patrol radius from raids and sieges.").ToString();
+    private static readonly string _stayInSettlementText = new TextObject("{=PAIOzsG1s1J}Stay in a settlement").ToString();
+    private static readonly string _landpatrolHintText = new TextObject("Patrol an area around the target settlement. The party will visit villages and towns to restock its troops and supplies. Bandits and other enemies will be chased down if the party leader believes they can be caught. The party will defend villages and castles/towns within its patrol radius from raids and sieges.").ToString();
     private static readonly string _visitHintText = new TextObject("{=PAIljAEpAKF}Visit a settlement but don't stay there.").ToString();
     private static readonly string _escortHintText = new TextObject("{=PAIEI3gTLMP}Escort a party").ToString();
     private static readonly string _stayInSettlementHintText = new TextObject("{=PAIVeQlQhCC}Stay in the settlement. Will not defend the settlement if it is under siege and the party is outside the walls.").ToString();
-    private static readonly string _besiegeText = new TextObject("{=PAIgXDbzpdD}Besiege A Settlement").ToString();
+    private static readonly string _besiegeText = new TextObject("{=PAIgXDbzpdD}Besiege a settlement").ToString();
     private static readonly string _besiegeHintText = new TextObject("{=PAIzxQXNul8}The party or army will besiege the target settlement. The order will be cleared upon capturing the city or by the attacking army being defeated.").ToString();
-    private static readonly string _defendText = new TextObject("{=PAIgNGL6W5j}Defend A Settlement").ToString();
+    private static readonly string _defendText = new TextObject("{=PAIgNGL6W5j}Defend a settlement").ToString();
     private static readonly string _defendHintText = new TextObject("{=PAITZmUFJSB}Stay in the garrison of the settlement. The party may make occassional visits to other settlements for food if there is not enough food in the settlement to buy.").ToString();
 
     public static void Create(PartyAiEntitySettings settings, Action callback, bool fallback = false)

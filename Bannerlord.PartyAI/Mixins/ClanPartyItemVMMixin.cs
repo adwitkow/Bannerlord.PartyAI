@@ -93,7 +93,7 @@ internal class ClanPartyItemVMMixin : BaseViewModelMixin<ClanPartyItemVM>
             _vm.IsPartyBehaviorEnabled = false;
         }
 
-        string itemName = _heroSettings.PartyTemplate?.Name ?? new TextObject("{=PATZD6SvrZr}None").ToString();
+        string itemName = _heroSettings.PartyTemplate?.Name ?? new TextObject("{=PATZD6SvrZr}No Template").ToString();
 
         SelectedTemplateText = new TextObject("{=PAhmBRjnrwV}Troop Template: {NAME}").SetTextVariable("NAME", itemName).ToString();
         OnPropertyChangedWithValue(SelectedTemplateText, "SelectedTemplateText");
