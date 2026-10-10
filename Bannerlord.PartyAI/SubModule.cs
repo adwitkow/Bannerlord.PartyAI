@@ -94,14 +94,12 @@ public class SubModule : MBSubModuleBase
             return;
         }
 
-        ValidateGameModel(Campaign.Current.Models.PartyTroopUpgradeModel);
-        ValidateGameModel(Campaign.Current.Models.ArmyManagementCalculationModel);
-        ValidateGameModel(Campaign.Current.Models.PrisonerRecruitmentCalculationModel);
-        ValidateGameModel(Campaign.Current.Models.SettlementGarrisonModel);
-        ValidateGameModel(Campaign.Current.Models.PartyFoodBuyingModel);
-
-        string keycombo = PartySettingsManager.ControlPanelModiferKey.ToString() + "+" + PartySettingsManager.ControlPanelKey.ToString();
-        TaleWorlds.Library.InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=PAIEUwVpMPm}Thank you for using Party AI Controls! To access the configuration panel, press {KEYBIND}!").SetTextVariable("KEYBIND", keycombo).ToString(), Colors.Green));
+        string keycombo = $"{PartySettingsManager.ControlPanelModiferKey}+{PartySettingsManager.ControlPanelKey}";
+        TaleWorlds.Library.InformationManager.DisplayMessage(
+            new InformationMessage(
+                new TextObject("{=PAIEUwVpMPm}Thank you for using Party AI Controls! To access the configuration panel, press {KEYBIND}!")
+                    .SetTextVariable("KEYBIND", keycombo).ToString(),
+                Colors.Green));
     }
 
     protected override void OnApplicationTick(float dt)
@@ -169,29 +167,6 @@ public class SubModule : MBSubModuleBase
         // but as of 1.4.5 the base GameModel isn't initialized in the non-generic method
         // Great job as always TaleWorlds
         starter.AddModel<TModel>(new TDecorator());
-    }
-
-    private void ValidateGameModel(GameModel model)
-    {
-        var modelType = model.GetType();
-        var modelAssembly = model.GetType().Assembly;
-        var thisAssembly = GetType().Assembly;
-
-        if (modelAssembly == thisAssembly)
-        {
-            return;
-        }
-
-        if (!modelType.BaseType.IsAbstract)
-        {
-            var thisAssemblyName = thisAssembly.GetName().Name;
-            var modelAssemblyName = modelAssembly.GetName().Name;
-
-            TextObject error = new($"{{=I2LlBDKr}}Game Model Error: Please move {thisAssemblyName} "
-                + $"below {modelAssemblyName} in your load order to ensure mod compatibility");
-
-            TaleWorlds.Library.InformationManager.DisplayMessage(new InformationMessage(error.ToString(), Colors.Red));
-        }
     }
 
     private static void TryApplyBannerKingsConflictPatches(Harmony harmony)
