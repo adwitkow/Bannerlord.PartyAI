@@ -125,11 +125,6 @@ public class PartyAIModOptionsVM : ViewModel
             SubModule.PartySettingsManager.AggressivePatrols,
             new TextObject("{=PAIFxvrVYlD}If enabled, all AI patrols will attack any parties that come in range if they can catch them. Amends the 'Patrolling around X' AI behavior to include searching for targets--normally they wander aimlessly and don't attack anything. This is applied across the board, so you may not want to enable it until you're in the vassal/kingdom stage so there'll be more bandits."));
       
-        AIRecruitCultureToggle = new PartyAIOptionToggleVM(
-            new TextObject("{=PAIJugGVraS}AI Recruit Culture"),
-            SubModule.PartySettingsManager.AggressivePatrols,
-            new TextObject("{=PAIJZdGLEmg}TODO"));
-       
         AutoCreateClanPartiesToggle = new PartyAIOptionToggleVM(
             new TextObject("{=PAIsUcGJNnV}Auto Create Clan Parties"),
             _autoCreationBehavior.AutoCreateClanParties,
@@ -159,13 +154,6 @@ public class PartyAIModOptionsVM : ViewModel
         LeaderRosterHiddenHint = new HintViewModel(new TextObject("{=!}" + _hiddenLeadersHint));
 
         _troopsConvertedPerDay = SubModule.PartySettingsManager.TroopsConvertedPerDay;
-
-        if (AccessTools.TypeByName("ROT.SubModule") != null)
-        {
-            AIRecruitCultureToggle.IsDisabled = true;
-            AIRecruitCultureToggle.IsSelected = false;
-            AIRecruitCultureToggle.Hint = new(new TextObject("{=PAIGsrQyFUm}This feature is not compatible with Realm of Thrones, which already incorporates a version of it."));
-        }
 
         RefreshValues();
         OnChangeAllowTroopConversion(AllowTroopConversionForGarrisonsToggle.IsSelected);
@@ -240,7 +228,6 @@ public class PartyAIModOptionsVM : ViewModel
     [DataSourceProperty] public PartyAIOptionToggleVM ManageKingdomGarrisonsToggle { get; private set; }
 
     [DataSourceProperty] public PartyAIOptionToggleVM AggressivePatrolsToggle { get; private set; }
-    [DataSourceProperty] public PartyAIOptionToggleVM AIRecruitCultureToggle { get; private set; }
 
     [DataSourceProperty] public PartyAIOptionToggleVM AutoCreateClanPartiesToggle { get; private set; }
 
@@ -358,7 +345,6 @@ public class PartyAIModOptionsVM : ViewModel
         SubModule.PartySettingsManager.ManageKingdomParties = ManageKingdomPartiesToggle.IsSelected;
         SubModule.PartySettingsManager.ManageKingdomGarrisons = ManageKingdomGarrisonsToggle.IsSelected;
         SubModule.PartySettingsManager.AggressivePatrols = AggressivePatrolsToggle.IsSelected;
-        SubModule.PartySettingsManager.AIRecruitCulture = AIRecruitCultureToggle.IsSelected;
 
         _autoCreationBehavior.UpdateSettings(
             AutoCreateClanPartiesToggle.IsSelected,
