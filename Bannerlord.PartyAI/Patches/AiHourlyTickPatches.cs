@@ -155,13 +155,34 @@ public class AiHourlyTickPatches
             return;
         }
 
-        var after = __1.AIBehaviorScores
+        var rawAfter = __1.AIBehaviorScores
             .OrderByDescending(x => x.Item2)
             .ToArray();
 
-        if (!Before.SequenceEqual(after))
+        if (!Before.SequenceEqual(rawAfter))
         {
+            var before = Before.Select(x => new AIBehaviorDisplay(x)).ToArray();
+            var after = rawAfter
+                .Select(x => new AIBehaviorDisplay(x))
+                .ToArray();
             // Breakpoint here :)
+        }
+    }
+
+    private class AIBehaviorDisplay
+    {
+        private AIBehaviorData _data;
+        private float _weight;
+
+        public AIBehaviorDisplay((AIBehaviorData Data, float Weight) tuple)
+        {
+            _data = tuple.Data;
+            _weight = tuple.Weight;
+        }
+
+        public override string ToString()
+        {
+            return $"{_data.AiBehavior} {_data.Party.Name} - {_weight}";
         }
     }
 }
