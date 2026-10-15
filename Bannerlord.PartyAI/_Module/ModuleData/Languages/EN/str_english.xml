@@ -236,5 +236,6 @@
   <string id="PAIu0g5Z5Yk"                        text="Allow this party to recruit troops from enemy settlements. This can be useful for parties that are operating behind enemy lines, but is also risky."/>
   <string id="PAhQoukaUbN"                        text="May Take Troops From Settlements"/>
   <string id="PAID8JkoxK0"                        text="Daily Budget"/>
+  <string id="PAIAreaPatrolHint"                  text="Patrol an area around the target settlement." />
 </strings>
 </base>

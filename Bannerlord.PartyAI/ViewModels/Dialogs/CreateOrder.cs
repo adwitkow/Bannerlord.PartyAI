@@ -27,7 +27,7 @@ internal class CreateOrder
     private static readonly string _recruitText = new TextObject("{=PAIyzzBSM4P}Recruit").ToString();
     private static readonly string _recruitHint = new TextObject("{=PAIHJFAtbk8}Order the party leader to only focus on recruiting troops. If they have an assigned troop template, they will only visit settlements that offer those troops. Keep in mind these settlements may be far away.").ToString();
     private static readonly string _stayInSettlementText = new TextObject("{=PAIOzsG1s1J}Stay in a settlement").ToString();
-    private static readonly string _landpatrolHintText = new TextObject("Patrol an area around the target settlement. The party will visit villages and towns to restock its troops and supplies. Bandits and other enemies will be chased down if the party leader believes they can be caught. The party will defend villages and castles/towns within its patrol radius from raids and sieges.").ToString();
+    private static readonly string _landpatrolHintText = new TextObject("{=PAIAreaPatrolHint}Patrol an area around the target settlement.").ToString();
     private static readonly string _visitHintText = new TextObject("{=PAIljAEpAKF}Visit a settlement but don't stay there.").ToString();
     private static readonly string _escortHintText = new TextObject("{=PAIEI3gTLMP}Escort a party").ToString();
     private static readonly string _stayInSettlementHintText = new TextObject("{=PAIVeQlQhCC}Stay in the settlement. Will not defend the settlement if it is under siege and the party is outside the walls.").ToString();
