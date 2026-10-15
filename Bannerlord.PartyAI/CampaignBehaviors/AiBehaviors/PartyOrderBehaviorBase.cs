@@ -69,9 +69,10 @@ public abstract class PartyOrderBehaviorBase : CampaignBehaviorBase
 
     protected void AddBehaviorScore(AIBehaviorData behaviorData, float score, PartyThinkParams thinkParams)
     {
-        if (thinkParams.TryGetBehaviorScore(in behaviorData, out float previousScore))
+        if (thinkParams.TryGetBehaviorScore(in behaviorData, out float previousScore)
+            && score > previousScore)
         {
-            thinkParams.SetBehaviorScore(in behaviorData, score + previousScore);
+            thinkParams.SetBehaviorScore(in behaviorData, score);
             return;
         }
 
