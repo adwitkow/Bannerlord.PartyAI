@@ -2,5 +2,5 @@
 
 internal class Constants
 {
-    public const float BehaviorScore = 25f;
+    public const float BehaviorScore = 100f;
 }
