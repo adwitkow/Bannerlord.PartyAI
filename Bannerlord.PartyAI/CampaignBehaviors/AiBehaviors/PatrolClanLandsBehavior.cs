@@ -1,16 +1,23 @@
 ﻿using Bannerlord.PartyAI.Domain.Models;
 using Bannerlord.PartyAI.Models;
+using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 
 namespace Bannerlord.PartyAI.CampaignBehaviors.AiBehaviors;
 
 internal class PatrolClanLandsBehavior : PartyOrderBehaviorBase
 {
+    private const int MaxPatrolDays = 4;
+    private const int Outdated = 8;
+
     protected override PartyAiOrderType OrderType => PartyAiOrderType.PatrolClanLands;
+
+    private Dictionary<(string PartyId, string SettlementId), int> _daysTargetingDictionary = [];
 
     public override void RegisterEvents()
     {
@@ -20,24 +27,25 @@ internal class PatrolClanLandsBehavior : PartyOrderBehaviorBase
 
     private void OnDailyTick(MobileParty party)
     {
-        var hero = party.LeaderHero;
         if (!IsPartyOrderRelevant(party, out var settings, out var order))
         {
             return;
         }
 
-        TryPickNewTarget(hero, settings, order);
+        ClearOutdatedTargets();
+        TickAllTargets();
+
+        TryPickNewTarget(party, settings, order);
     }
 
     private void OnAiHourlyTick(MobileParty party, PartyThinkParams thinkParams)
     {
-        var hero = party.LeaderHero;
-        if (!IsPartyOrderRelevant(hero, out var settings, out var order))
+        if (!IsPartyOrderRelevant(party, out var settings, out var order))
         {
             return;
         }
 
-        if (!ShouldContinueExecutingOrder(hero, settings, order))
+        if (!ShouldContinueExecutingOrder(party, settings, order))
         {
             return;
         }
@@ -63,20 +71,23 @@ internal class PatrolClanLandsBehavior : PartyOrderBehaviorBase
 #endif
     }
 
-    private bool ShouldContinueExecutingOrder(Hero hero, PartyAiEntitySettings settings, PartyAiOrder order)
+    private bool ShouldContinueExecutingOrder(MobileParty party, PartyAiEntitySettings settings, PartyAiOrder order)
     {
         var target = order.Target as Settlement;
-        return (target is not null && !FactionManager.IsAtWarAgainstFaction(hero.MapFaction, target.MapFaction))
-            || TryPickNewTarget(hero, settings, order);
+        return (target is not null && !FactionManager.IsAtWarAgainstFaction(party.MapFaction, target.MapFaction))
+            || TryPickNewTarget(party, settings, order);
     }
 
-    private bool TryPickNewTarget(Hero hero, PartyAiEntitySettings settings, PartyAiOrder order)
+    private bool TryPickNewTarget(MobileParty party, PartyAiEntitySettings settings, PartyAiOrder order)
     {
         var averageDistance = Campaign.Current.GetAverageDistanceBetweenClosestTwoTownsWithNavigationType(MobileParty.NavigationType.Default);
         var range = averageDistance * settings.PatrolRadius;
         var maxDistanceSq = range * 2 * (range * 2);
 
-        var clanSettlements = hero.Clan.Settlements;
+        var clanSettlements = party.ActualClan.Settlements
+            .Where(settlement => !IsBlacklisted(settlement, party))
+            .ToMBList();
+
         if (clanSettlements.Count == 0)
         {
             settings.ClearOrder(); // fallback to kingdom settlements?
@@ -84,35 +95,83 @@ internal class PatrolClanLandsBehavior : PartyOrderBehaviorBase
         }
 
         var settlementsByDistance = clanSettlements
-            .Select(settlement => (Settlement: settlement, DistanceSquared: settlement.Position.DistanceSquared(hero.PartyBelongedTo.Position)))
+            .Select(settlement => (Settlement: settlement, DistanceSquared: settlement.Position.DistanceSquared(party.Position)))
             .OrderBy(tuple => tuple.DistanceSquared)
             .ToArray();
         var closest = settlementsByDistance[0];
 
+        Settlement target;
         // Away from clan lands
         if (closest.DistanceSquared > maxDistanceSq)
         {
-            order.Target = closest.Settlement;
-            return true;
+            target = closest.Settlement;
+        }
+        else
+        {
+            // Variety in patrols
+            var random = MBRandom.RandomFloat;
+            if (random < 0.01)
+            {
+                // 1% to switch to a completely random clan settlement
+                target = clanSettlements.GetRandomElement();
+            }
+            else if (random < 0.25f)
+            {
+                // 25% to switch to a random clan settlement within range
+                var settlementsInRange = settlementsByDistance
+                    .Where(tuple => tuple.DistanceSquared < maxDistanceSq)
+                    .ToArray();
+
+                target = settlementsInRange.GetRandomElement().Settlement;
+            }
+            else
+            {
+                target = closest.Settlement;
+            }
         }
 
-        // Variety in patrols
-        var random = MBRandom.RandomFloat;
-        if (random < 0.01)
-        {
-            // 1% to switch to a completely random clan settlement
-            order.Target = clanSettlements.GetRandomElement();
-        }
-        else if (random < 0.25f)
-        {
-            // 25% to switch to a random clan settlement within range
-            var settlementsInRange = settlementsByDistance
-                .Where(tuple => tuple.DistanceSquared < maxDistanceSq)
-                .ToArray();
+        order.Target = target;
 
-            order.Target = settlementsInRange.GetRandomElement().Settlement;
-        }
+        AddTargetIfMissing(target, party);
 
         return true;
+    }
+
+    private bool IsBlacklisted(Settlement settlement, MobileParty mobileParty)
+    {
+        _daysTargetingDictionary.TryGetValue((mobileParty.StringId, settlement.StringId), out int days);
+
+        return days > MaxPatrolDays;
+    }
+
+    private void ClearOutdatedTargets()
+    {
+        var toClear = _daysTargetingDictionary
+            .Where(pair => pair.Value > Outdated)
+            .Select(pair => pair.Key)
+            .ToArray();
+
+        foreach (var key in toClear)
+        {
+            _daysTargetingDictionary.Remove(key);
+        }
+    }
+
+    private void TickAllTargets()
+    {
+        var keys = _daysTargetingDictionary.Keys.ToArray();
+        foreach (var key in keys)
+        {
+            _daysTargetingDictionary[key]++;
+        }
+    }
+
+    private void AddTargetIfMissing(Settlement settlement, MobileParty mobileParty)
+    {
+        var key = (mobileParty.StringId, settlement.StringId);
+        if (!_daysTargetingDictionary.ContainsKey(key))
+        {
+            _daysTargetingDictionary[key] = 0;
+        }
     }
 }
