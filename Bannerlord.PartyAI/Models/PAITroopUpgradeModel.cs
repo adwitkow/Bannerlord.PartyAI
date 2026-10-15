@@ -12,14 +12,9 @@ namespace Bannerlord.PartyAI.Models;
 
 internal class PAITroopUpgradeModel : PartyTroopUpgradeModel
 {
-    public override bool CanPartyUpgradeTroopToTarget(PartyBase party, CharacterObject character, CharacterObject target)
-    {
-        return BaseModel.CanPartyUpgradeTroopToTarget(party, character, target);
-    }
-
     public override bool DoesPartyHaveRequiredItemsForUpgrade(PartyBase party, CharacterObject upgradeTarget)
     {
-        if (party.Owner?.Equals(Hero.MainHero) ?? false)
+        if (Hero.MainHero.Equals(party.Owner))
         {
             return BaseModel.DoesPartyHaveRequiredItemsForUpgrade(party, upgradeTarget);
         }
@@ -28,30 +23,17 @@ internal class PAITroopUpgradeModel : PartyTroopUpgradeModel
         return true;
     }
 
-    public override bool DoesPartyHaveRequiredPerksForUpgrade(PartyBase party, CharacterObject character, CharacterObject upgradeTarget, out PerkObject requiredPerk)
-    {
-        return BaseModel.DoesPartyHaveRequiredPerksForUpgrade(party, character, upgradeTarget, out requiredPerk);
-    }
-
-    public override ExplainedNumber GetGoldCostForUpgrade(PartyBase party, CharacterObject characterObject, CharacterObject upgradeTarget)
-    {
-        return BaseModel.GetGoldCostForUpgrade(party, characterObject, upgradeTarget);
-    }
-
-    public override int GetSkillXpFromUpgradingTroops(PartyBase party, CharacterObject troop, int numberOfTroops)
-    {
-        return BaseModel.GetSkillXpFromUpgradingTroops(party, troop, numberOfTroops);
-    }
-
     public override float GetUpgradeChanceForTroopUpgrade(PartyBase party, CharacterObject troop, int upgradeTargetIndex)
     {
-        if (party.MobileParty == null) return BaseModel.GetUpgradeChanceForTroopUpgrade(party, troop, upgradeTargetIndex);
-        if (party.MobileParty.IsGarrison)
+        if (party.MobileParty == null)
         {
-            if (!SubModule.PartySettingsManager.IsGarrisonManageable(party.MobileParty.CurrentSettlement))
-            {
-                return BaseModel.GetUpgradeChanceForTroopUpgrade(party, troop, upgradeTargetIndex);
-            }
+            return BaseModel.GetUpgradeChanceForTroopUpgrade(party, troop, upgradeTargetIndex);
+        }
+
+        if (party.MobileParty.IsGarrison
+            && !SubModule.PartySettingsManager.IsGarrisonManageable(party.MobileParty.CurrentSettlement))
+        {
+            return BaseModel.GetUpgradeChanceForTroopUpgrade(party, troop, upgradeTargetIndex);
         }
         else if (!SubModule.PartySettingsManager.IsManageable(party.LeaderHero))
         {
@@ -75,9 +57,13 @@ internal class PAITroopUpgradeModel : PartyTroopUpgradeModel
 
         PartyComposition comp = Recruitment.GetPartyComposition(party, heroSettings, troop);
 
-        if (heroSettings.MaxTroopTier > 0 && troop.Tier >= heroSettings.MaxTroopTier) { return 0f; }
+        if (heroSettings.MaxTroopTier > 0 && troop.Tier >= heroSettings.MaxTroopTier)
+        {
+            return 0f;
+        }
 
-        if (Recruitment.ShouldRecruit(comp, heroSettings, troop.UpgradeTargets[upgradeTargetIndex], party))
+        var upgradeTarget = troop.UpgradeTargets[upgradeTargetIndex];
+        if (Recruitment.ShouldRecruit(comp, heroSettings, upgradeTarget, party))
         {
             return 1f;
         }
@@ -95,10 +81,14 @@ internal class PAITroopUpgradeModel : PartyTroopUpgradeModel
             }
         }
 
-        if (heroSettings.PartyTemplate?.Troops.Contains(troop.UpgradeTargets[upgradeTargetIndex]) ?? true)
+        if (heroSettings.PartyTemplate?.Troops.Contains(upgradeTarget) ?? true)
         {
-            IEnumerable<FormationClass> newTargets = Recruitment.UpgradeTargets(troop.UpgradeTargets[upgradeTargetIndex], true, heroSettings.PartyTemplate).ConvertAll(c => FormationClassExtensions.FallbackClass(c.DefaultFormationClass)).Distinct();
-            IEnumerable<FormationClass> currentTargets = Recruitment.UpgradeTargets(troop, true, heroSettings.PartyTemplate).ConvertAll(c => FormationClassExtensions.FallbackClass(c.DefaultFormationClass)).Distinct();
+            var newTargets = Recruitment.UpgradeTargets(upgradeTarget, true, heroSettings.PartyTemplate)
+                .ConvertAll(c => c.DefaultFormationClass.FallbackClass())
+                .Distinct();
+            var currentTargets = Recruitment.UpgradeTargets(troop, true, heroSettings.PartyTemplate)
+                .ConvertAll(c => c.DefaultFormationClass.FallbackClass())
+                .Distinct();
             if (Enumerable.SequenceEqual(newTargets, currentTargets))
             {
                 return 1f;
@@ -108,22 +98,19 @@ internal class PAITroopUpgradeModel : PartyTroopUpgradeModel
         return 0f;
     }
 
-    public override int GetXpCostForUpgrade(PartyBase party, CharacterObject characterObject, CharacterObject upgradeTarget)
-    {
-        return BaseModel.GetXpCostForUpgrade(party, characterObject, upgradeTarget);
-    }
-
     public override bool IsTroopUpgradeable(PartyBase party, CharacterObject character)
     {
         bool result = BaseModel.IsTroopUpgradeable(party, character);
 
-        if (!result || party.MobileParty == null) return result;
-        if (party.MobileParty.IsGarrison)
+        if (!result || party.MobileParty == null)
         {
-            if (!SubModule.PartySettingsManager.IsGarrisonManageable(party.MobileParty.CurrentSettlement))
-            {
-                return result;
-            }
+            return result;
+        }
+
+        if (party.MobileParty.IsGarrison
+            && !SubModule.PartySettingsManager.IsGarrisonManageable(party.MobileParty.CurrentSettlement))
+        {
+            return result;
         }
         else if (!SubModule.PartySettingsManager.IsManageable(party.LeaderHero))
         {
@@ -140,4 +127,31 @@ internal class PAITroopUpgradeModel : PartyTroopUpgradeModel
 
         return false;
     }
+
+    #region Pass-through overrides
+    public override bool CanPartyUpgradeTroopToTarget(PartyBase party, CharacterObject character, CharacterObject target)
+    {
+        return BaseModel.CanPartyUpgradeTroopToTarget(party, character, target);
+    }
+
+    public override bool DoesPartyHaveRequiredPerksForUpgrade(PartyBase party, CharacterObject character, CharacterObject upgradeTarget, out PerkObject requiredPerk)
+    {
+        return BaseModel.DoesPartyHaveRequiredPerksForUpgrade(party, character, upgradeTarget, out requiredPerk);
+    }
+
+    public override ExplainedNumber GetGoldCostForUpgrade(PartyBase party, CharacterObject characterObject, CharacterObject upgradeTarget)
+    {
+        return BaseModel.GetGoldCostForUpgrade(party, characterObject, upgradeTarget);
+    }
+
+    public override int GetSkillXpFromUpgradingTroops(PartyBase party, CharacterObject troop, int numberOfTroops)
+    {
+        return BaseModel.GetSkillXpFromUpgradingTroops(party, troop, numberOfTroops);
+    }
+
+    public override int GetXpCostForUpgrade(PartyBase party, CharacterObject characterObject, CharacterObject upgradeTarget)
+    {
+        return BaseModel.GetXpCostForUpgrade(party, characterObject, upgradeTarget);
+    }
+    #endregion
 }

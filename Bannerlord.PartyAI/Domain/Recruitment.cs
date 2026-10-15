@@ -40,8 +40,8 @@ public static class Recruitment
         {
             var targetRatio = heroSettings.Composition[formationClass];
             var currentRatio = comp[formationClass];
-            float need = targetRatio - currentRatio;
-            need *= party.PartySizeLimit;
+            var needRatio = targetRatio - currentRatio;
+            var need = needRatio * party.PartySizeLimit;
 
             if (need >= (mustBeOnePlus ? 1f : 0.4f))
             {
@@ -52,7 +52,10 @@ public static class Recruitment
         return false;
     }
 
-    public static PartyComposition GetPartyComposition(PartyBase party, PartyAiEntitySettings heroSettings, CharacterObject ignore = null)
+    public static PartyComposition GetPartyComposition(
+        PartyBase party,
+        PartyAiEntitySettings heroSettings,
+        CharacterObject? ignore = null)
     {
         PAICustomTemplate template = heroSettings.PartyTemplate;
         PartyComposition resultComposition = new();
@@ -129,7 +132,10 @@ public static class Recruitment
         return resultComposition;
     }
 
-    public static List<CharacterObject> UpgradeTargets(CharacterObject troop, bool maxTierOnly = false, PAICustomTemplate template = null)
+    public static List<CharacterObject> UpgradeTargets(
+        CharacterObject troop,
+        bool maxTierOnly = false,
+        PAICustomTemplate? template = null)
     {
         if (troop == null)
         {
@@ -157,12 +163,13 @@ public static class Recruitment
     {
         TroopRoster results = TroopRoster.CreateDummyTroopRoster();
         List<CharacterObject> characters = new();
-        Occupation[] occupations = new Occupation[3] { Occupation.Soldier, Occupation.Mercenary, Occupation.CaravanGuard };
+        Occupation[] occupations = [Occupation.Soldier, Occupation.Mercenary, Occupation.CaravanGuard];
         List<CharacterObject> exclude = new();
 
         foreach (CharacterObject troop in CharacterObject.All)
         {
-            if (!characters.Contains(troop) && !troop.IsHero && troop.Culture != null && !troop.Culture.IsBandit && occupations.Contains(troop.Occupation))
+            if (!characters.Contains(troop) && !troop.IsHero && troop.Culture != null
+                && !troop.Culture.IsBandit && occupations.Contains(troop.Occupation))
             {
                 characters.AppendList(TraverseTree(troop).Where(co => co.UpgradeTargets?.Length == 0).ToList());
             }
@@ -224,8 +231,9 @@ public static class Recruitment
                     continue;
                 }
 
-                var recruitmentCost = Campaign.Current.Models.PartyWageModel.GetTroopRecruitmentCost(troop, buyer).RoundedResultNumber;
-                var wage = Campaign.Current.Models.PartyWageModel.GetCharacterWage(troop);
+                var partyWageModel = Campaign.Current.Models.PartyWageModel;
+                var recruitmentCost = partyWageModel.GetTroopRecruitmentCost(troop, buyer).RoundedResultNumber;
+                var wage = partyWageModel.GetCharacterWage(troop);
                 var budget = mobileParty.GetAvailableWageBudget();
                 if (mobileParty.PartyTradeGold < recruitmentCost || budget < wage)
                 {
@@ -293,7 +301,7 @@ public static class Recruitment
 
     public static bool IsOverMaxTier(CharacterObject troop, int maxTier) => maxTier > 0 && troop?.Tier > maxTier;
 
-    private static SimpleRosterElement SimplifyRosterElement(TroopRosterElement element, PAICustomTemplate template)
+    private static SimpleRosterElement SimplifyRosterElement(TroopRosterElement element, PAICustomTemplate? template)
     {
         var character = element.Character;
         var number = element.Number;
