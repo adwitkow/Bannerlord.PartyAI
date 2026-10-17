@@ -157,6 +157,7 @@ public class SubModule : MBSubModuleBase
         AddModel<SettlementGarrisonModel, PAISettlementGarrisonModel>(starter);
 #endif
         AddModel<PartyFoodBuyingModel, PAIPartyFoodBuyingModel>(starter);
+        AddModel<BattleRewardModel, PartyAiBattleRewardModel>(starter);
     }
 
     private static void AddModel<TModel, TDecorator>(CampaignGameStarter starter)
