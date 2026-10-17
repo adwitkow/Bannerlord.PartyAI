@@ -31,7 +31,8 @@ internal class AiVisitSettlementBehaviorPatches
         MobileParty mobileParty = hero.PartyBelongedTo;
         PartyAiEntitySettings heroSettings = SubModule.PartySettingsManager.Settings(hero);
 
-        if (!heroSettings.AllowRecruitment)
+        if (!heroSettings.AllowRecruitment
+            || heroSettings.Order?.Behavior is PartyAiOrderType.RecruitFromTemplate)
         {
             __result = (0, 0f);
             return;
@@ -53,7 +54,9 @@ internal class AiVisitSettlementBehaviorPatches
         foreach (Hero notable in settlement.Notables)
         {
             if (!notable.IsAlive)
+            {
                 continue;
+            }
 
             int maxIndex = Campaign.Current.Models.VolunteerModel.MaximumIndexHeroCanRecruitFromHero(
               mobileParty.IsGarrison ? mobileParty.Party.Owner : mobileParty.LeaderHero,
@@ -64,7 +67,9 @@ internal class AiVisitSettlementBehaviorPatches
             {
                 CharacterObject troop = notable.VolunteerTypes[i];
                 if (troop == null)
+                {
                     continue;
+                }
 
                 if (Recruitment.ShouldRecruit(comp, heroSettings, troop, mobileParty.Party))
                 {
