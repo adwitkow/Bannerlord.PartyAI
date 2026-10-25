@@ -141,14 +141,23 @@ public static class Navigation
             query = query.Where(condition);
         }
 
-        return query
+        var fewClosest = query
             .OrderBy(settlement =>
                 DistanceHelper.FindClosestDistanceFromMapPointToSettlement(
                     mapPoint,
                     settlement,
                     sanitizedNavType,
                     out _))
-            .Skip(MBRandom.RandomInt(5))
+            .Take(5)
+            .ToArray();
+
+        if (fewClosest.Length <= 1)
+        {
+            return fewClosest.FirstOrDefault();
+        }
+
+        return fewClosest
+            .Skip(fewClosest.Length - 1)
             .FirstOrDefault();
     }
 }
