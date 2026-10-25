@@ -232,10 +232,9 @@ public static class Recruitment
                 }
 
                 var partyWageModel = Campaign.Current.Models.PartyWageModel;
-                var recruitmentCost = partyWageModel.GetTroopRecruitmentCost(troop, buyer).RoundedResultNumber;
                 var wage = partyWageModel.GetCharacterWage(troop);
                 var budget = mobileParty.GetAvailableWageBudget();
-                if (mobileParty.PartyTradeGold < recruitmentCost || budget < wage)
+                if (budget < wage)
                 {
                     continue;
                 }
