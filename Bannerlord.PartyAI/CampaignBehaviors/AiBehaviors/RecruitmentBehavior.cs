@@ -1,6 +1,7 @@
 ﻿using Bannerlord.PartyAI.Domain;
 using Bannerlord.PartyAI.Domain.Models;
 using Bannerlord.PartyAI.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -61,7 +62,6 @@ internal class RecruitmentBehavior : PartyOrderBehaviorBase
     private void OnDailyTick()
     {
         _recentlyRecruitedFromSettlements.RemoveAll(l => l.Visited.ElapsedDaysUntilNow > RecruitmentSettlementCooldownDays);
-
     }
 
     private void OnAiHourlyTick(MobileParty party, PartyThinkParams thinkParams)
@@ -94,14 +94,14 @@ internal class RecruitmentBehavior : PartyOrderBehaviorBase
         if (targetSettlement is null)
         {
             Message.OrderStoppedNoValidTargets(party, order);
-            settings.ClearOrder();
+            StopOrder(settings);
             return;
         }
 
         if (!TryNavigateToSettlement(party, targetSettlement, AiBehavior.GoToSettlement, thinkParams))
         {
             Message.OrderStoppedTargetUnreachable(party, order);
-            settings.ClearOrder();
+            StopOrder(settings);
             return;
         }
 
@@ -213,6 +213,15 @@ internal class RecruitmentBehavior : PartyOrderBehaviorBase
         return settings.AutoRecruitment
             && party.PartySizeRatio < settings.AutoRecruitmentPercentage
             && party.Army == null;
+    }
+
+    private void StopOrder(PartyAiEntitySettings settings)
+    {
+        settings.ClearOrder();
+        _recentlyRecruitedFromSettlements.RemoveAll(l => string.Equals(
+            l.Party?.StringId,
+            settings.Hero?.PartyBelongedTo?.StringId,
+            StringComparison.InvariantCultureIgnoreCase));
     }
 
     public class PAISettlementVisitLog
