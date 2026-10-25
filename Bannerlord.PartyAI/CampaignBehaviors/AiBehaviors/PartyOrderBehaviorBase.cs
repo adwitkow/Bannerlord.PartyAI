@@ -57,6 +57,11 @@ public abstract class PartyOrderBehaviorBase : CampaignBehaviorBase
         [NotNullWhen(true)] out PartyAiEntitySettings? settings,
         [NotNullWhen(true)] out PartyAiOrder? order)
     {
+        if (!IsPartyOrderRelevant(party?.LeaderHero, out settings, out order))
+        {
+            return false;
+        }
+
         if (party?.GetNumDaysForFoodToLast() <= 3)
         {
             settings = null;
@@ -64,7 +69,7 @@ public abstract class PartyOrderBehaviorBase : CampaignBehaviorBase
             return false;
         }
 
-        return IsPartyOrderRelevant(party?.LeaderHero, out settings, out order);
+        return true;
     }
 
     protected void AddBehaviorScore(AIBehaviorData behaviorData, float score, PartyThinkParams thinkParams)
