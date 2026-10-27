@@ -14,7 +14,7 @@ namespace Bannerlord.PartyAI.CampaignBehaviors.AiBehaviors;
 
 internal class RecruitmentBehavior : PartyOrderBehaviorBase
 {
-    private const int RecruitmentSettlementCooldownDays = 10;
+    private const int RecruitmentSettlementCooldownDays = 3;
 
     private List<PAISettlementVisitLog> _recentlyRecruitedFromSettlements = new();
 
