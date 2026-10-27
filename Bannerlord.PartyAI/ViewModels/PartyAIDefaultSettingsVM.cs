@@ -60,7 +60,7 @@ public class PartyAIDefaultSettingsVM : ViewModel
             });
         }
 
-        public void EditPartyTemplate() => SelectTemplate.Select(_settings, RefreshValues);
+        public void EditPartyTemplate() => AssignTemplateModal.Show(_settings, onConfirm: RefreshValues);
 
         public void EditPartyOptions()
         {

@@ -155,11 +155,13 @@ public class PartyAIControlsMenuPartyVM : ViewModel
 
     public void EditPartyTemplate()
     {
-        SelectTemplate.Select(Settings, delegate
-        {
-            OnPropertyChangedWithValue(TemplateName, "TemplateName");
-            RefreshValues();
-        });
+        AssignTemplateModal.Show(
+            Settings,
+            onConfirm: () =>
+            {
+                OnPropertyChangedWithValue(TemplateName, "TemplateName");
+                RefreshValues();
+            });
     }
 
     public void OpenOrderQueue()

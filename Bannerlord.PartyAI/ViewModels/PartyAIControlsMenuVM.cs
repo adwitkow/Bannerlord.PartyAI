@@ -184,11 +184,11 @@ public class PartyAIControlsMenuVM : ViewModel
         GameStateManager.Current.PopState();
     }
 
-    public void CreatePartyTemplate() => CreateTemplate.Create();
+    public void CreatePartyTemplate() => NewTemplateModal.Show();
 
-    public void DeletePartyTemplate() => DeleteTemplate.Delete(new Action(RefreshPartyList));
+    public void DeletePartyTemplate() => DeleteTemplateModal.Show(onConfirm: RefreshPartyList);
 
-    public void FineTunePartyTemplate() => Dialogs.FineTune.Tune();
+    public void FineTunePartyTemplate() => FineTuneTemplateModal.Show();
 
     public void OpenModOptions() => SubModule.InformationManager.ShowModOptionsInquiry(RefreshPartyList);
 

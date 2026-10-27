@@ -38,7 +38,6 @@ internal class ClanPartyItemVMMixin : BaseViewModelMixin<ClanPartyItemVM>
         CopyToText = new TextObject("{=PAISIjwQiXw}Copy To").ToString();
         SetPartyTemplateText = new TextObject("{=PAS8COe7Ysl}Set").ToString();
         DeletePartyTemplateText = new TextObject("{=PAQVXq6izAW}DEL").ToString();
-        ViewPartyTemplateText = new TextObject("{=PAkCYmU0Qtl}View").ToString();
         EditPartyCompositionText = new TextObject("{=PAHiRSTCnkv}Edit Party Composition").ToString();
 
         OnRefresh();
@@ -73,7 +72,9 @@ internal class ClanPartyItemVMMixin : BaseViewModelMixin<ClanPartyItemVM>
     [DataSourceMethod]
     public void EditPartyTemplate()
     {
-        SelectTemplate.Select(_heroSettings, OnRefresh);
+        AssignTemplateModal.Show(
+            _heroSettings,
+            onConfirm: OnRefresh);
     }
 
     internal void HandleSavePartyComposition(PartyComposition composition)
@@ -128,9 +129,6 @@ internal class ClanPartyItemVMMixin : BaseViewModelMixin<ClanPartyItemVM>
     public string SelectedTemplateText { get; private set; }
 
     [DataSourceProperty]
-    public string ViewPartyTemplateText { get; }
-
-    [DataSourceProperty]
     public string SetPartyTemplateText { get; }
 
     [DataSourceProperty]
@@ -177,21 +175,14 @@ internal class ClanPartyItemVMMixin : BaseViewModelMixin<ClanPartyItemVM>
     public void CreatePartyTemplate()
     {
         SelectedParty = _vm.Party;
-        CreateTemplate.Create();
+        NewTemplateModal.Show();
     }
 
     [DataSourceMethod]
     public void OpenOrderQueue() => SubModule.InformationManager.ShowOrderQueueInquiry(_heroSettings, OnRefresh);
 
     [DataSourceMethod]
-    public void ViewPartyTemplate()
-    {
-        SelectedParty = _vm.Party;
-        ViewTemplate.View();
-    }
-
-    [DataSourceMethod]
-    public void DeletePartyTemplate() => ViewModels.Dialogs.DeleteTemplate.Delete(new Action(OnRefresh));
+    public void DeletePartyTemplate() => DeleteTemplateModal.Show(onConfirm: OnRefresh);
 
     [DataSourceMethod]
     public void ToggleShowOptions()

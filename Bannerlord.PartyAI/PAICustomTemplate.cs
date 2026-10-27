@@ -34,8 +34,6 @@ public class PAICustomTemplate
         UpgradeTargets = upgradeTargets;
 
         Troops = ResolveTroops().ToList();
-
-        SubModule.PartySettingsManager.AddPartyTemplate(this);
     }
 
     internal IEnumerable<CharacterObject> ResolveTroops()

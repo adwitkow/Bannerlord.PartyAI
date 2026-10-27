@@ -11,25 +11,29 @@ namespace Bannerlord.PartyAI.ViewModels.Misc;
 internal static class VMUtilities
 {
     internal static void OpenPartyScreen(
-        TroopRoster leftRoster,
-        TroopRoster rightRoster,
-        TextObject leftPartyName = null,
-        TextObject rightPartyName = null,
-        TextObject header = null,
-        PartyPresentationDoneButtonDelegate doneDelegate = null,
-        PartyPresentationDoneButtonConditionDelegate doneCondition = null,
-        PartyBase leftParty = null,
-        PartyBase rightParty = null,
+        TroopRoster? leftRoster,
+        TroopRoster? rightRoster,
+        TextObject? leftPartyName = null,
+        TextObject? rightPartyName = null,
+        TextObject? header = null,
+        PartyPresentationDoneButtonDelegate? doneDelegate = null,
+        PartyPresentationDoneButtonConditionDelegate? doneCondition = null,
+        PartyBase? leftParty = null,
+        PartyBase? rightParty = null,
         int leftSizeLimit = 0,
-        IsTroopTransferableDelegate
-        transferableDelegate = null,
-        PartyPresentationCancelButtonDelegate cancelDelegate = null)
+        IsTroopTransferableDelegate? transferableDelegate = null,
+        PartyPresentationCancelButtonDelegate? cancelDelegate = null)
     {
-        Game current = Game.Current;
         PartyScreenLogic partyScreenLogic = new();
 
         leftRoster ??= TroopRoster.CreateDummyTroopRoster();
         rightRoster ??= TroopRoster.CreateDummyTroopRoster();
+
+        if (doneCondition is null)
+        {
+            doneCondition = (_, _, rightMemberRoster, _, _, _)
+                => IsTemplateRosterValid(rightMemberRoster);
+        }
 
         var initializationData = new PartyScreenLogicInitializationData
         {
@@ -43,7 +47,9 @@ internal static class VMUtilities
             RightPrisonerRoster = TroopRoster.CreateDummyTroopRoster(),
             LeftLeaderHero = null,
             RightLeaderHero = null,
-            LeftPartyMembersSizeLimit = leftParty != null ? leftParty.PartySizeLimit : leftSizeLimit,
+            LeftPartyMembersSizeLimit = leftParty != null
+                ? leftParty.PartySizeLimit
+                : leftSizeLimit,
             LeftPartyPrisonersSizeLimit = 0,
             RightPartyMembersSizeLimit = (rightParty ?? PartyBase.MainParty) != null
                 ? (rightParty ?? PartyBase.MainParty).PartySizeLimit
@@ -55,7 +61,7 @@ internal static class VMUtilities
                 : (rightParty ?? PartyBase.MainParty).Name,
             TroopTransferableDelegate = transferableDelegate ?? IsTroopTransferable,
             PartyPresentationDoneButtonDelegate = doneDelegate,
-            PartyPresentationDoneButtonConditionDelegate = doneCondition ?? IsTemplateRosterValid,
+            PartyPresentationDoneButtonConditionDelegate = doneCondition,
             PartyPresentationCancelButtonActivateDelegate = null,
             PartyPresentationCancelButtonDelegate = cancelDelegate,
             IsDismissMode = false,
@@ -70,7 +76,9 @@ internal static class VMUtilities
         };
 
         partyScreenLogic.Initialize(initializationData);
+
         //Create state directly
+        Game current = Game.Current;
         PartyState partyState = current.GameStateManager.CreateState<PartyState>();
         partyState.IsDonating = false;
         partyState.PartyScreenMode = Helpers.PartyScreenHelper.PartyScreenMode.Normal; // enum lives in Helpers.PartyScreenHelper
@@ -87,11 +95,11 @@ internal static class VMUtilities
         return false;
     }
 
-    internal static Tuple<bool, TextObject> IsTemplateRosterValid(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, int leftLimitNum, int rightLimitNum)
+    internal static Tuple<bool, TextObject> IsTemplateRosterValid(TroopRoster rightMemberRoster)
     {
         if (rightMemberRoster.TotalManCount > 0)
         {
-            return new Tuple<bool, TextObject>(true, null);
+            return new Tuple<bool, TextObject>(true, TextObject.GetEmpty());
         }
         else
         {

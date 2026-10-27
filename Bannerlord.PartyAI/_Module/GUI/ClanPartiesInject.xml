@@ -47,11 +47,6 @@
 									</Children>
 								</ButtonWidget>
 
-								<ButtonWidget DoNotPassEventsToChildren='true' WidthSizePolicy='Fixed' HeightSizePolicy='StretchToParent' SuggestedWidth="30" MarginRight="35" Brush='ButtonBrush2' VerticalAlignment="Top" UpdateChildrenStates='true' Command.Click='ViewPartyTemplate'>
-									<Children>
-										<TextWidget WidthSizePolicy='StretchToParent' HeightSizePolicy='StretchToParent' Brush='Kingdom.GeneralButtons.Text' Text='@ViewPartyTemplateText' />
-									</Children>
-								</ButtonWidget>
 								<ButtonWidget DoNotPassEventsToChildren='true' WidthSizePolicy='Fixed' HeightSizePolicy='StretchToParent' SuggestedWidth="30" MarginRight="35" Brush='ButtonBrush2' VerticalAlignment="Top" UpdateChildrenStates='true' Command.Click='DeletePartyTemplate'>
 									<Children>
 										<TextWidget WidthSizePolicy='StretchToParent' HeightSizePolicy='StretchToParent' Brush='Kingdom.GeneralButtons.Text' Text='@DeletePartyTemplateText' />
