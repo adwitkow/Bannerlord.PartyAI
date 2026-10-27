@@ -56,7 +56,10 @@ internal class RecruitmentBehavior : PartyOrderBehaviorBase
         var party = recruiter.PartyBelongedTo;
         var partyComposition = Recruitment.GetPartyComposition(party.Party, settings);
 
-        _recentlyRecruitedFromSettlements.Add(new(settlement, CampaignTime.Now, recruiter.PartyBelongedTo));
+        if (!HasPartyRecentlyRecruitedFromSettlement(recruiter.PartyBelongedTo, settlement))
+        {
+            _recentlyRecruitedFromSettlements.Add(new(settlement, CampaignTime.Now, recruiter.PartyBelongedTo));
+        }
     }
 
     private void OnDailyTick()
@@ -119,11 +122,16 @@ internal class RecruitmentBehavior : PartyOrderBehaviorBase
             return true;
         }
 
-        var settlementRecentlyVisited = _recentlyRecruitedFromSettlements.Any(l => l.Settlement == currentSettlement && l.Party == party);
+        var settlementRecentlyVisited = HasPartyRecentlyRecruitedFromSettlement(party, currentSettlement);
         var volunteersAvailable = Recruitment.CollectEligibleVolunteers(party, currentSettlement, settings, partyComposition).Count > 0;
         var canVisitSettlement = IsSettlementSuitableForVisiting(party, currentSettlement);
 
         return settlementRecentlyVisited || !volunteersAvailable || !canVisitSettlement;
+    }
+
+    private bool HasPartyRecentlyRecruitedFromSettlement(MobileParty party, Settlement settlement)
+    {
+        return _recentlyRecruitedFromSettlements.Any(l => l.Settlement == settlement && l.Party == party);
     }
 
     private bool IsGoodTargetForRecruiting(
@@ -148,7 +156,7 @@ internal class RecruitmentBehavior : PartyOrderBehaviorBase
             return false;
         }
 
-        if (_recentlyRecruitedFromSettlements.Any(l => l.Settlement == settlement && l.Party == party))
+        if (HasPartyRecentlyRecruitedFromSettlement(party, settlement))
         {
             return false;
         }
